@@ -1,0 +1,29 @@
+name: universe.sync
+
+networks:
+  universe.domain:
+    name: universe.domain
+    driver: bridge
+
+volumes:
+  universe.store:
+    name: universe.store
+    driver: local
+
+include:
+  - path: mysql/compose.yaml
+    env_file: mysql/.env
+  - path: pgsql/compose.yaml
+    env_file: pgsql/.env
+  - path: mongo/compose.yaml
+    env_file: mongo/.env
+  - path: redis/compose.yaml
+    env_file: redis/.env
+  - path: memcached/compose.yaml
+    env_file: memcached/.env
+  - path: rabbitmq/compose.yaml
+    env_file: rabbitmq/.env
+  - path: kafka/compose.yaml
+    env_file: kafka/.env
+  - path: nginx/compose.yaml
+    env_file: nginx/.env

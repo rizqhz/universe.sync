@@ -1,0 +1,54 @@
+services:
+  pgsql.server:
+    container_name: universe.db.pgsql.server
+    image: postgres:19rc1-alpine3.24
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-db_example}
+    hostname: node-pgsql-server
+    networks:
+      - universe.domain
+    # ports:
+    #   - "5432:5432" (nginx)
+    volumes:
+      - /docker/pgsql/data:/var/lib/postgresql:rw
+    # depends_on:
+    #   - (none)
+    healthcheck:
+      test: psql -U $$POSTGRES_USER -d $$POSTGRES_DB -c 'select current_database()' || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped
+  pgsql.panel:
+    container_name: universe.db.pgsql.panel
+    image: dpage/pgadmin4:9.18.0
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-user@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-password}
+      PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT:-80}
+      PGADMIN_CONFIG_SERVER_MODE: ${PGADMIN_CONFIG_SERVER_MODE:-False}
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: ${PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED:-False}
+    hostname: node-pgsql-panel
+    networks:
+      - universe.domain
+    # ports:
+    #   - "80:80" (nginx)
+    volumes:
+      - /docker/pgsql/server.json:/pgadmin4/servers.json:rw
+      - /docker/pgsql/admin:/var/lib/pgadmin:rw
+    depends_on:
+      pgsql.server:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: wget -qO- http://127.0.0.1/misc/ping || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped

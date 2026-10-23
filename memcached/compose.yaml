@@ -1,0 +1,29 @@
+services:
+  memcached:
+    container_name: universe.cache.memcached
+    image: memcached:1.6.45-alpine3.24
+    # environment:
+    #   - (none)
+    hostname: node-memcached
+    networks:
+      - universe.domain
+    # ports:
+    #   - "11211:11211" (nginx)
+    # volumes:
+    #   - (none)
+    # depends_on:
+    #   - (none)
+    healthcheck:
+      test: echo stats | nc 127.0.0.1 11211 | grep -q uptime || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    command:
+      - memcached
+      - -c 1024
+      - -t 4
+      - -m 64
+      - -v
+    restart: unless-stopped

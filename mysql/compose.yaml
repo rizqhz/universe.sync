@@ -1,0 +1,56 @@
+services:
+  mysql.server:
+    container_name: universe.db.mysql.server
+    image: mysql:26.7.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-db_example}
+      MYSQL_USER: ${MYSQL_USER:-user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD:-no}
+    hostname: node-mysql-server
+    networks:
+      - universe.domain
+    # ports:
+    #   - "3306:3306" (nginx)
+    volumes:
+      - /docker/mysql/data:/var/lib/mysql:rw
+    # depends_on:
+    #   - (none)
+    healthcheck:
+      test: mysql -u$$MYSQL_USER -p$$MYSQL_PASSWORD -e"use $$MYSQL_DATABASE" || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped
+  mysql.panel:
+    container_name: universe.db.mysql.panel
+    image: phpmyadmin:5.2.3-fpm-alpine
+    environment:
+      PMA_HOST: ${PMA_HOST:-127.0.0.1}
+      PMA_PORT: ${PMA_PORT:-3306}
+      UPLOAD_LIMIT: ${UPLOAD_LIMIT:-512M}
+      MAX_EXECUTION_TIME: ${MAX_EXECUTION_TIME:-300}
+      HIDE_PHP_VERSION: ${HIDE_PHP_VERSION:-false}
+    hostname: node-mysql-panel
+    networks:
+      - universe.domain
+    # ports:
+    #   - "9000:9000" (nginx)
+    volumes:
+      - /docker/mysql/admin:/sessions:rw
+      - universe.store:/var/www/html:rw
+    depends_on:
+      mysql.server:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: pgrep -f php-fpm >/dev/null && netstat -tuln | grep -q ':9000' || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped

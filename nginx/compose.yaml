@@ -1,0 +1,47 @@
+services:
+  nginx:
+    container_name: universe.proxy.server
+    image: nginx:1.31.7-alpine3.24
+    environment:
+      NGINX_ENTRYPOINT_QUIET_LOGS: ${NGINX_ENTRYPOINT_QUIET_LOGS:-1}
+    hostname: node-nginx
+    networks:
+      - universe.domain
+    ports:
+      - "80:80"
+    volumes:
+      - /docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /docker/nginx/conf.d:/etc/nginx/conf.d:rw
+      - /docker/nginx/templates:/etc/nginx/templates:rw
+      - /docker/nginx/static:/usr/share/nginx/html:ro
+      - universe.store:/var/www/html:ro
+    depends_on:
+      mysql.panel:
+        condition: service_healthy
+        restart: true
+      pgsql.panel:
+        condition: service_healthy
+        restart: true
+      mongo.server:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      memcached:
+        condition: service_healthy
+        restart: true
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      kafka:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: curl -f http://universe.sync/ || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped

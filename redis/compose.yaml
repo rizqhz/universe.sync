@@ -1,0 +1,27 @@
+services:
+  redis:
+    container_name: universe.cache.redis
+    image: redis:8.10.2-alpine3.23
+    environment:
+      REDIS_CONF: ${REDIS_CONF:-/etc/redis/redis.conf}
+      REDIS_USER: ${REDIS_USER:-user}
+      REDIS_PASS: ${REDIS_PASS:-password}
+    hostname: node-redis
+    networks:
+      - universe.domain
+    # ports:
+    #   - "6379:6379" (nginx)
+    volumes:
+      - /docker/redis/redis.conf:/etc/redis/redis.conf:rw
+      - /docker/redis/data:/data:rw
+    # depends_on:
+    #   - (none)
+    healthcheck:
+      test: redis-cli --user $$REDIS_USER -a $$REDIS_PASS ping 2>&1 | grep -q PONG || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    command: redis-server $REDIS_CONF
+    restart: unless-stopped

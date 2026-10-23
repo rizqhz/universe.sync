@@ -1,0 +1,25 @@
+services:
+  rabbitmq:
+    container_name: universe.broker.rabbitmq
+    image: rabbitmq:4.3.6-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-user}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-password}
+    hostname: node-rabbitmq
+    networks:
+      - universe.domain
+    # ports:
+    #   - "15672:15672" (nginx)
+    #   - "5672:5672" (nginx)
+    volumes:
+      - /docker/rabbitmq/data:/var/lib/rabbitmq:rw
+    # depends_on:
+    #   - (none)
+    healthcheck:
+      test: rabbitmq-diagnostics ping -q || exit 1
+      start_period: 1m
+      start_interval: 1s
+      retries: 3
+      interval: 1m30s
+      timeout: 10s
+    restart: unless-stopped
