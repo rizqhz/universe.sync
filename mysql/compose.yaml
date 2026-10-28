@@ -41,7 +41,7 @@ services:
     #   - "9000:9000" (nginx)
     volumes:
       - /docker/mysql/admin:/sessions:rw
-      - universe.store:/var/www/html:rw
+      - mysql.store:/var/www/html:rw
     depends_on:
       mysql.server:
         condition: service_healthy
@@ -54,3 +54,8 @@ services:
       interval: 1m30s
       timeout: 10s
     restart: unless-stopped
+
+volumes:
+  mysql.store:
+    name: mysql.store
+    driver: local

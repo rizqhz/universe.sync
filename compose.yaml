@@ -5,11 +5,6 @@ networks:
     name: universe.domain
     driver: bridge
 
-volumes:
-  universe.store:
-    name: universe.store
-    driver: local
-
 include:
   - path: mysql/compose.yaml
     env_file: mysql/.env

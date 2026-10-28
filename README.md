@@ -87,7 +87,7 @@ Check that Docker and Docker Compose are installed:
 
 ```bash
 💲 sudo make world-set
-💲 sudo make world-del
+💲 sudo make world-end
 ```
 
 <div align=center>

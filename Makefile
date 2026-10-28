@@ -9,7 +9,7 @@ world-set: set.sh
 	fi
 	@sudo docker compose up --detach
 
-world-del: unset.sh
+world-end: unset.sh
 	@sudo docker compose down --volumes
 	@if [ -e /docker ]; then \
 		echo -n "[!] removing the docker root folder..."; \

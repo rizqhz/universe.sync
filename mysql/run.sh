@@ -28,7 +28,7 @@ docker run -d --rm --name universe.db.mysql.panel
     -e HIDE_PHP_VERSION=${HIDE_PHP_VERSION:-false}
     -p 9000:9000
     -v /docker/mysql/admin:/sessions:rw
-    -v universe.store:/var/www/html:rw
+    -v mysql.store:/var/www/html:rw
     --network universe.domain
     --restart always
     --health-cmd "pgrep -f php-fpm >/dev/null && netstat -tuln | grep -q ':9000' || exit 1"

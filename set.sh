@@ -13,11 +13,9 @@ if [[ ! -d $root/nginx ]]; then
     base=$root/nginx && install -d -m 777 $base
     echo "create: $base"
     for params in \
-        "777 0 0 d static" \
-        "777 0 0 d templates" \
         "777 0 0 d conf.d" \
-        "777 0 0 f conf.d/default.conf" \
-        "777 0 0 f conf.d/main.conf" \
+        "777 0 0 f conf.d/http.conf" \
+        "777 0 0 f conf.d/stream.conf" \
         "777 0 0 f nginx.conf" \
     ; do
         set -- $params && entry=$base/$5
