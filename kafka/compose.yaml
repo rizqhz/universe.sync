@@ -3,15 +3,14 @@ services:
     container_name: universe.broker.kafka
     image: apache/kafka:4.3.2
     environment:
-      PATH: /opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/kafka/bin
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://localhost:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka.universe.sync:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENERS: CONTROLLER://127.0.0.1:9091,EXTERNAL://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://kafka.universe.sync:9092,INTERNAL://universe.broker.kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -21,17 +20,14 @@ services:
     hostname: node-kafka
     networks:
       - universe.domain
-    # ports:
-    #   - "9092:9092" (nginx)
     volumes:
       - /docker/kafka/data:/var/lib/kafka/data:rw
-    # depends_on:
-    #   - (none)
     healthcheck:
-      test: kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list || exit 1
-      start_period: 1m
-      start_interval: 1s
+      test: >
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server universe.broker.kafka:9093 --list || exit 1
+      start_period: 30s
+      start_interval: 10s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped

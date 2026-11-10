@@ -8,20 +8,16 @@ services:
     hostname: node-mongo-server
     networks:
       - universe.domain
-    # ports:
-    #   - "27017:27017" (nginx)
     volumes:
       - /docker/mongo/data:/data/db:rw
-    # depends_on:
-    #   - (none)
     healthcheck:
       test: >
-        mongosh -u $$MONGO_INITDB_ROOT_USERNAME -p $$MONGO_INITDB_ROOT_PASSWORD \
-          --authenticationDatabase admin \
-          --eval "db.adminCommand('ping')" || exit 1
-      start_period: 1m
-      start_interval: 1s
+        mongosh -u $$MONGO_INITDB_ROOT_USERNAME \
+                -p $$MONGO_INITDB_ROOT_PASSWORD \
+                --authenticationDatabase admin --eval "db.adminCommand('ping')" || exit 1
+      start_period: 75s
+      start_interval: 25s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped

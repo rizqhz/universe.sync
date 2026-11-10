@@ -43,10 +43,11 @@ services:
         condition: service_healthy
         restart: true
     healthcheck:
-      test: "curl -f -H 'Host: universe.sync' http://127.0.0.1/ping | grep -q PONG || exit 1"
-      start_period: 1m
+      test: >
+        curl -fs -H 'Host: universe.sync' http://127.0.0.1/ping | grep PONG || exit 1
+      start_period: 5s
       start_interval: 1s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped

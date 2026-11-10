@@ -19,3 +19,6 @@ world-end: unset.sh
 		echo "[!] docker root folder already removed"; \
 		echo "    path: /docker (\e[32mSkipped\e[m)"; \
 	fi
+
+check: health.sh
+	@./${?}

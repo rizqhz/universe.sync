@@ -8,18 +8,14 @@ services:
     hostname: node-rabbitmq
     networks:
       - universe.domain
-    # ports:
-    #   - "15672:15672" (nginx)
-    #   - "5672:5672" (nginx)
     volumes:
       - /docker/rabbitmq/data:/var/lib/rabbitmq:rw
-    # depends_on:
-    #   - (none)
     healthcheck:
-      test: rabbitmq-diagnostics ping -q || exit 1
-      start_period: 1m
-      start_interval: 1s
+      test: >
+        rabbitmq-diagnostics ping -q || exit 1
+      start_period: 30s
+      start_interval: 10s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped

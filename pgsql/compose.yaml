@@ -9,18 +9,15 @@ services:
     hostname: node-pgsql-server
     networks:
       - universe.domain
-    # ports:
-    #   - "5432:5432" (nginx)
     volumes:
       - /docker/pgsql/data:/var/lib/postgresql:rw
-    # depends_on:
-    #   - (none)
     healthcheck:
-      test: psql -U $$POSTGRES_USER -d $$POSTGRES_DB -c 'select current_database()' || exit 1
-      start_period: 1m
-      start_interval: 1s
+      test: >
+        psql -U $$POSTGRES_USER -d $$POSTGRES_DB -c 'select current_database()' || exit 1
+      start_period: 30s
+      start_interval: 10s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped
   pgsql.panel:
@@ -35,8 +32,6 @@ services:
     hostname: node-pgsql-panel
     networks:
       - universe.domain
-    # ports:
-    #   - "80:80" (nginx)
     volumes:
       - /docker/pgsql/server.json:/pgadmin4/servers.json:rw
       - /docker/pgsql/admin:/var/lib/pgadmin:rw
@@ -45,10 +40,11 @@ services:
         condition: service_healthy
         restart: true
     healthcheck:
-      test: wget -qO- http://127.0.0.1/misc/ping || exit 1
-      start_period: 1m
-      start_interval: 1s
+      test: >
+        wget -qO- http://127.0.0.1/misc/ping || exit 1
+      start_period: 100s
+      start_interval: 50s
       retries: 3
-      interval: 1m30s
+      interval: 5m
       timeout: 10s
     restart: unless-stopped
