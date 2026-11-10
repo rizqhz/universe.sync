@@ -1,0 +1,8 @@
+127.0.0.1 universe.sync
+127.0.0.1 pgsql.universe.sync
+127.0.0.1 mysql.universe.sync
+127.0.0.1 mongo.universe.sync
+127.0.0.1 redis.universe.sync
+127.0.0.1 memcached.universe.sync
+127.0.0.1 rabbitmq.universe.sync
+127.0.0.1 kafka.universe.sync
